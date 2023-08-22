@@ -1,7 +1,10 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { nanoid } from 'nanoid';
+import { toast } from 'react-toastify';
+import notifyOptions from 'NotifyOptions/NotifyOptions';
+import 'react-toastify/dist/ReactToastify.css';
 import { BsFillTelephoneFill, BsPersonFill } from 'react-icons/bs';
 import { IoMdPersonAdd } from 'react-icons/io';
 
@@ -26,14 +29,42 @@ const schema = yup.object().shape({
     .required(),
 });
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = () => {
+  const contacts = useSelector(state => state.contacts.contacts);
+  const dispatch = useDispatch();
+
+  const addContact = newContact => {
+    const includesContact = contacts.filter(
+      contact =>
+        contact.name.toLowerCase().trim() ===
+          newContact.name.toLowerCase().trim() ||
+        contact.number.trim() === newContact.number.trim()
+    ).length;
+
+    if (includesContact) {
+      return toast.error(
+        `${newContact.name}: is already in contacts`,
+        notifyOptions
+      );
+    } else {
+      dispatch({
+        type: 'contacts/addContact',
+        payload: newContact,
+      });
+    }
+    toast.success(
+      `${newContact.name} was successfully added to your contacts`,
+      notifyOptions
+    );
+  };
+
   const initialValues = {
     name: '',
     number: '',
   };
 
   const handleSubmit = (values, { resetForm }) => {
-    onAddContact({ id: nanoid(), ...values });
+    addContact({ id: nanoid(), ...values });
     resetForm();
   };
 
@@ -93,7 +124,4 @@ const ContactForm = ({ onAddContact }) => {
   );
 };
 
-ContactForm.propTypes = {
-  handleSubmit: PropTypes.func,
-};
 export default ContactForm;

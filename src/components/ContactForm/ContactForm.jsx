@@ -1,12 +1,15 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
-import { nanoid } from 'nanoid';
+// import { nanoid } from 'nanoid';
 import { toast } from 'react-toastify';
 import notifyOptions from 'NotifyOptions/NotifyOptions';
 import 'react-toastify/dist/ReactToastify.css';
 import { BsFillTelephoneFill, BsPersonFill } from 'react-icons/bs';
 import { IoMdPersonAdd } from 'react-icons/io';
+
+import { getContacts } from 'redux/selectors';
+import { addContact } from 'redux/contacts/contactsSlice';
 
 import css from './ContactForm.module.css';
 
@@ -30,10 +33,10 @@ const schema = yup.object().shape({
 });
 
 const ContactForm = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
 
-  const addContact = newContact => {
+  const onAddContact = newContact => {
     const includesContact = contacts.filter(
       contact =>
         contact.name.toLowerCase().trim() ===
@@ -47,10 +50,7 @@ const ContactForm = () => {
         notifyOptions
       );
     } else {
-      dispatch({
-        type: 'contacts/addContact',
-        payload: newContact,
-      });
+      dispatch(addContact(newContact));
     }
     toast.success(
       `${newContact.name} was successfully added to your contacts`,
@@ -64,7 +64,7 @@ const ContactForm = () => {
   };
 
   const handleSubmit = (values, { resetForm }) => {
-    addContact({ id: nanoid(), ...values });
+    onAddContact({ ...values });
     resetForm();
   };
 

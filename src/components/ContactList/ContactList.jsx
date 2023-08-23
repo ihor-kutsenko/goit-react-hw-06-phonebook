@@ -6,19 +6,21 @@ import notifyOptions from 'NotifyOptions/NotifyOptions';
 import 'react-toastify/dist/ReactToastify.css';
 import { RiDeleteBinLine } from 'react-icons/ri';
 
+import { getContacts } from 'redux/selectors';
+import { getFilter } from 'redux/selectors';
+import { deleteContact } from 'redux/contacts/contactsSlice';
+
 import css from './ContactList.module.css';
 
 const ContactList = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
-  const filter = useSelector(state => state.filter.filter);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  console.log(contacts);
 
   const dispatch = useDispatch();
 
-  const deleteContact = id => {
-    dispatch({
-      type: 'contacts/deleteContact',
-      payload: id,
-    });
+  const onDeleteContact = id => {
+    dispatch(deleteContact(id));
 
     const deletedContact = contacts.find(contact => contact.id === id);
     if (deletedContact) {
@@ -43,7 +45,7 @@ const ContactList = () => {
             <button
               type="button"
               className={css.button}
-              onClick={() => deleteContact(id)}
+              onClick={() => onDeleteContact(id)}
             >
               <RiDeleteBinLine size="16" />
             </button>

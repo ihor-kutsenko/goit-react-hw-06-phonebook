@@ -15,7 +15,6 @@ import css from './ContactList.module.css';
 const ContactList = () => {
   const contacts = useSelector(getContacts);
   const filter = useSelector(getFilter);
-  console.log(contacts);
 
   const dispatch = useDispatch();
 
